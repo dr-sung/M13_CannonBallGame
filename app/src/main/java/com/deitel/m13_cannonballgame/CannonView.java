@@ -2,6 +2,7 @@
 // Displays and controls the Cannon Game
 package com.deitel.m13_cannonballgame;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -21,6 +22,8 @@ import android.util.SparseIntArray;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+
+import static android.R.id.message;
 
 public class CannonView extends SurfaceView
         implements SurfaceHolder.Callback {
@@ -107,7 +110,7 @@ public class CannonView extends SurfaceView
         hitStates = new boolean[TARGET_PIECES];
 
         // initialize SoundPool to play the app's three sound effects
-        soundPool = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
+        soundPool = new SoundPool.Builder().setMaxStreams(10).build();
 
         // create Map of sounds and pre-load sounds
         soundMap = new SparseIntArray(3); // create new HashMap
@@ -359,12 +362,10 @@ public class CannonView extends SurfaceView
                     cannonballPaint);
 
         // draw the cannon barrel
-        canvas.drawLine(0, screenHeight / 2, barrelEnd.x, barrelEnd.y,
-                cannonPaint);
+        canvas.drawLine(0, screenHeight / 2, barrelEnd.x, barrelEnd.y, cannonPaint);
 
         // draw the cannon base
-        canvas.drawCircle(0, (int) screenHeight / 2,
-                (int) cannonBaseRadius, cannonPaint);
+        canvas.drawCircle(0, screenHeight / 2, cannonBaseRadius, cannonPaint);
 
         // draw the blocker
         canvas.drawLine(blocker.start.x, blocker.start.y, blocker.end.x,
@@ -395,9 +396,9 @@ public class CannonView extends SurfaceView
         }
     } // end method drawGameElements
 
-    // display an AlertDialog when the game ends
     private void showGameOverDialog(final int messageId) {
         // DialogFragment to display quiz stats and start new quiz
+
         final DialogFragment gameResult =
                 new DialogFragment() {
                     // create an AlertDialog and return it
@@ -500,7 +501,7 @@ public class CannonView extends SurfaceView
 
     // Thread subclass to control the game loop
     private class CannonThread extends Thread {
-        private SurfaceHolder surfaceHolder; // for manipulating canvas
+        private final SurfaceHolder surfaceHolder; // for manipulating canvas
         private boolean threadIsRunning = true; // running by default
 
         // initializes the surface holder
